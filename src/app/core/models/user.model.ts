@@ -5,7 +5,7 @@ export interface LoginRequest {
 
 export interface RegisterRequest {
     email : string ;
-    passwoord : string
+    password : string
 }
 
 export interface LoginResponse {

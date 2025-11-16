@@ -1,0 +1,9 @@
+nav a {
+  transition: 0.2s ease;
+}
+
+nav a.active {
+  font-weight: bold;
+  color: #2563eb;
+}
+

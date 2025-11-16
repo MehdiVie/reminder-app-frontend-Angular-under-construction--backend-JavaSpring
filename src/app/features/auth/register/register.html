@@ -1,0 +1,73 @@
+<div class="login-wrapper">
+    <div class="login-card">
+        <h3 class="title">Create Acount</h3>
+         <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form">
+            <!-- Email -->
+            <div class="form-control">
+                <label for="email">Email</label>
+                <input 
+                type="email"
+                id="email"
+                formControlName="email"
+                placeholder="Enter your email."
+                />
+                <p class="error" *ngIf="email?.invalid && email?.touched">
+                    <span *ngIf="email?.errors?.['required']">Email is required.</span>
+                    <span *ngIf="email?.errors?.['email']">Invalid email format.</span>
+                </p>
+            </div>
+            <!-- Password -->
+            <div class="form-control">
+                <label for="password">Password</label>
+                <input
+                type="password"
+                id="password"
+                formControlName="password"
+                placeholder="Enter your password."
+                />
+                <p class="error" *ngIf="password?.invalid && password?.touched">
+                <span *ngIf="password?.errors?.['required']">Password is required.</span>
+                <span *ngIf="password?.errors?.['minlength']">
+                    Password must be at least {{ password?.errors?.['minlength']?.requiredLength }} characters.
+                </span>
+                </p>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="form-control">
+                <label for="confirmPassword">Confirm Password</label>
+                <input
+                type="password"
+                id="confirmPassword"
+                formControlName="confirmPassword"
+                placeholder="Repeat your password."
+                />
+                <p class="error" *ngIf="confirmPassword?.invalid && confirmPassword?.touched">
+                <span *ngIf="confirmPassword?.errors?.['required']">Please confirm your password.</span>
+                </p>
+                <p class="error" *ngIf="passwordMismatch">
+                Passwords do not match.
+                </p>
+            </div>
+            
+            <!-- Submit Button -->
+            <div style="margin-top: 20px;">
+                <button
+                type="submit"
+                id="submit"
+                class="btn"
+                [disabled]="form.invalid || isSubmitting()"
+                >
+                {{ isSubmitting() ? 'Signing up...' : 'Register' }}
+                </button>
+            </div>
+
+            <!-- Messages -->
+            <p class="error-message" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+            <p class="success-message" *ngIf="successMessage()">{{ successMessage() }}</p>
+
+
+         </form>
+
+    </div>
+</div>

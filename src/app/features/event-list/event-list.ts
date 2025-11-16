@@ -19,7 +19,7 @@ import { debounceTime, Subject } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { UpcomingReminder } from '../../core/models/UpcomingReminder.model';
-
+import { environment } from '../../../enviroments/environment';
 
 @Component({
   selector: 'app-event-list',
@@ -37,7 +37,7 @@ export class EventListComponent implements OnInit {
   showReminderIds = new Set<number>(); // store eventId that has Toast before
 
   currentPage = 0;
-  pageSize = 2;
+  pageSize = environment.pageSize;
   totalItems = 0;
   totalPages = 0;
   sortBy = 'id';

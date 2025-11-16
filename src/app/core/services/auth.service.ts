@@ -2,12 +2,13 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { LoginRequest, RegisterRequest , LoginResponse } from "../models/user.model";
 import { BehaviorSubject, Observable, tap } from "rxjs";
+import { environment } from '../../../enviroments/environment';
 
 @Injectable ({
     providedIn : 'root'
 })
 export class AuthService {
-    private readonly apiUrl = 'http://localhost:9090/api/auth';
+    private readonly apiUrl = environment.apiUrl+'/auth';
     private readonly token_key = 'jwt' ;
 
     private currentUserEmail = new BehaviorSubject<string | null>(null);
@@ -43,9 +44,15 @@ export class AuthService {
 
     hasRole(role : string) : boolean {
         const token = this.getToken();
+        //console.log("Admin Token is:",token);
         if (!token) return false;
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.roles?.includes(role);
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            //console.log("Admin Token-2 is:",payload.roles);
+            return (payload.roles || []).includes(role);
+        } catch {
+            return false;
+        }
     }
 
 

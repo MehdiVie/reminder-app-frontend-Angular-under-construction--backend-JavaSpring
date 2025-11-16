@@ -30,6 +30,29 @@
         {{ direction === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
       </mat-icon>
     </button>
+
+        <!-- Search Box -->
+    <div class="flex items-center gap-2 bg-white border border-gray-300 rounded-lg px-3 py-2 shadow-sm">
+      <mat-icon class="text-gray-500">search</mat-icon>
+      <input
+        type="text"
+        placeholder="Search events..."
+        [(ngModel)]="searchTerm"
+        (input)="onSearchChange($event.target.value)"
+        class="outline-none border-none w-48 sm:w-64 text-sm text-gray-700"
+      />
+    </div>
+
+    <!-- Date Filter -->
+    <div class="flex items-center gap-2 bg-white border border-gray-300 rounded-lg px-3 py-2 shadow-sm">
+      <mat-icon class="text-gray-500">calender_today</mat-icon>
+      <input 
+        type="date"
+        class="outline-none border-none text-sm text-gray-700"
+        [(ngModel)]="afterDate"
+        (change)="onSortAndSearchChange()"
+      />
+    </div>
   </div>
 </div>
   
@@ -116,7 +139,7 @@
     <button mat-stroked-button (click)="prevPage()" [disabled]="currentPage === 0">
       Prev
     </button>
-    <span>Page {{ currentPage + 1 }}</span>
+    <span>Page {{ currentPage + 1 }} of {{ totalPages }}</span>
     <button
       mat-stroked-button
       (click)="nextPage()"

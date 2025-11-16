@@ -5,12 +5,13 @@ import { Event } from '../models/event.model';
 import { ApiResponse } from '../models/apiResponse.model';
 import { PageResponse } from '../models/pageResponse.model';
 import { UpcomingReminder } from '../models/UpcomingReminder.model';
+import { environment } from '../../../enviroments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EventService {
-private apiUrl = 'http://localhost:9090/api/events';
+private apiUrl = environment.apiUrl+'/events';
 
 constructor(private http: HttpClient) {}
 

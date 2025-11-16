@@ -4,6 +4,7 @@ import { Observable } from "rxjs";
 import { ApiResponse } from "../models/apiResponse.model";
 import { AdminEvent } from "../models/adminEvent.model";
 import { PageResponse } from "../models/pageResponse.model";
+import { environment } from '../../../enviroments/environment';
 
 
 @Injectable({
@@ -11,7 +12,7 @@ import { PageResponse } from "../models/pageResponse.model";
 })
 
 export class AdminService {
-    private readonly baseUrl = "http://localhost:9090/api/admin";
+    private readonly baseUrl = environment.apiUrl+'/admin';
 
     constructor(private http: HttpClient) {}
 
@@ -20,7 +21,8 @@ export class AdminService {
       pageSize = 10 ,
       sortBy = 'id',
       direction : 'asc' | 'desc' = 'asc',
-      afterDate?: string
+      afterDate?: string,
+      search?: string
     ) :  Observable<ApiResponse<PageResponse<AdminEvent>>> {
           currentPage = isNaN(currentPage) ? 0 : currentPage;
           pageSize = isNaN(pageSize) ? 1 : pageSize;
@@ -29,6 +31,8 @@ export class AdminService {
                 .set('size',pageSize)
                 .set('sortBy',sortBy)
                 .set('direction',direction);
+          if (afterDate) params= params.set('afterDate',afterDate);
+          if (search) params= params.set('search',search);
     
       return this.http.get<ApiResponse<PageResponse<AdminEvent>>>(`${this.baseUrl}/events/paged`, { params, });
     

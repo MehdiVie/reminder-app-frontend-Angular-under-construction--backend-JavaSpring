@@ -1,0 +1,45 @@
+<nav class="bg-white shadow flex items-center justify-between px-6 py-4">
+    <!--logo-->
+    <div class="text-2xl font-bold text-blue-600">
+        Reminder App
+    </div>
+
+      <!-- Menu -->
+  <ul class="flex items-center gap-6 text-lg">
+
+    <!-- Only if NOT logged in -->
+    <ng-container *ngIf="!isLoggedIn()">
+      <li><a routerLink="/login" class="hover:text-blue-500">Login</a></li>
+      <li><a routerLink="/register" class="hover:text-blue-500">Register</a></li>
+    </ng-container>
+
+    <!-- Only logged-in users -->
+    <ng-container *ngIf="isLoggedIn() && !isAdmin()">
+      <li><a routerLink="/events" class="hover:text-blue-500">My Events</a></li>
+      <li>
+        <button 
+        class="hover:text-blue-500"
+        (click)="openAddEventDialog()">
+        Add Event
+        </button>
+    </li>
+    </ng-container>
+
+      <!-- Only admin -->
+    <ng-container *ngIf="isAdmin() && isLoggedIn()">
+      <li><a routerLink="admin/events" class="text-red-500">Events</a></li>
+      <li><a routerLink="admin/stats" class="text-red-500">Stats</a></li>
+    </ng-container>
+
+
+    <ng-container *ngIf="isLoggedIn()">
+    <li>
+        <button (click)="logout()" class="text-gray-700 hover:text-red-500">
+          Logout
+        </button>
+    </li>
+    </ng-container>
+
+  </ul>
+
+</nav>
