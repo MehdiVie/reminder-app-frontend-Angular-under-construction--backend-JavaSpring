@@ -15,6 +15,7 @@
 
     <!-- Only logged-in users -->
     <ng-container *ngIf="isLoggedIn() && !isAdmin()">
+      <li><a routerLink="/profile" class="hover:text-blue-500">My Profile</a></li>
       <li><a routerLink="/events" class="hover:text-blue-500">My Events</a></li>
       <li>
         <button 
@@ -26,9 +27,9 @@
     </ng-container>
 
       <!-- Only admin -->
-    <ng-container *ngIf="isAdmin() && isLoggedIn()">
-      <li><a routerLink="admin/events" class="text-red-500">Events</a></li>
-      <li><a routerLink="admin/stats" class="text-red-500">Stats</a></li>
+    <ng-container *ngIf="isLoggedIn() && isAdmin()">
+      <li><a routerLink="/admin/events" class="text-red-500">Events</a></li>
+      <li><a routerLink="/admin/stats" class="text-red-500">Stats</a></li>
     </ng-container>
 
 

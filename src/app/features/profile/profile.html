@@ -1,0 +1,173 @@
+<div class="p-8 bg-background min-h-screen flex justify-center">
+    <div class="w-full max-w-xl bg-white rounded-2xl shadow-md p-6">
+        <h2 class="text-2xl mb-4 font-bold">Profile</h2>
+
+        <div *ngIf="loading()" class="text-gray-500">Loading Profile...</div>
+
+        <div *ngIf="!loading() && profile">
+
+            <!-- User info -->
+            <div class="mb-6">
+                <p class="text-sm text-gray-500 ">Email</p>
+                <div class="flex items-center">
+                    <span class="text-lg font-semibold mr-3">
+                        {{ profile.email }} 
+                    </span>
+                    <button
+                        mat-raised-button
+                        color="primary"
+                        class="!bg-primary !text-white flex items-center gap-2 px-4 py-2 shadow-md hover:shadow-lg transition-all duration-200 self-end sm:self-auto"
+                        (click)="changeEmailMode()"
+                        >
+                        Change Email
+                    </button>
+                </div>
+                
+
+                <p class="text-sm text-gray-500 mt-4">Roles</p>
+                <div class="flex flex-wrap gap-2 mt-1">
+                    <span
+                        *ngFor="let role of profile.roles"
+                        class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700"
+                    >
+                        {{ role }}
+                    </span>
+                </div>
+            </div>
+
+             <button
+                mat-raised-button
+                color="primary"
+                class="!bg-primary !text-white flex items-center gap-2 px-4 py-2 shadow-md hover:shadow-lg transition-all duration-200 self-end sm:self-auto"
+                (click)="changePasswordMode()"
+                name="changePasswordBtn"
+             >
+                Change Password
+             </button>
+
+             <!-- Change password -->
+             <div *ngIf="passwordMode">
+                <hr class="my-4" />
+                <h3 class="text-xl font-semibold mb-3">Change password</h3>
+                <form [formGroup]="form" (ngSubmit)="onChangePassword()">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Current password</label>
+                        <input 
+                        type="password" 
+                        formControlName="oldPassword"
+                        class="w-full border rounded-lg px-3 py-2"
+                        />
+                        <p 
+                            class="text-red-500 text-xs mt-1"
+                            *ngIf="form.get('oldPassword')?.invalid && 
+                            form.get('oldPassword')?.touched
+                        ">
+                        Current password is required.
+                        </p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1 mt-4">New password</label>
+                        <input 
+                        type="password" 
+                        formControlName="newPassword"
+                        class="w-full border rounded-lg px-3 py-2"
+                        />
+                        <p 
+                            class="text-red-500 text-xs mt-1"
+                            *ngIf="form.get('newPassword')?.invalid && 
+                            form.get('newPassword')?.touched
+                        ">
+                        New password must be at least 6 characters.
+                        </p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1 mt-4">Confirm new password</label>
+                        <input 
+                        type="password" 
+                        formControlName="confirmPassword"
+                        class="w-full border rounded-lg px-3 py-2"
+                        />
+                        <p 
+                            class="text-red-500 text-xs mt-1"
+                            *ngIf="form.get('confirmPassword')?.invalid && 
+                            form.get('confirmPassword')?.touched
+                        ">
+                        Passwords do not match.
+                        </p>
+                    </div>
+                    <button 
+                        type="submit"
+                        class="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                        [disabled]="changingPassword() || form.invalid"
+                    >
+                        {{ changingPassword() ? "Saving..." : "Change Password" }}
+                    </button>
+                </form>
+             </div>
+
+             <!-- Change email -->
+             <div *ngIf="emailMode">
+                <hr class="my-4" />
+                <h3 class="text-xl font-semibold mb-3">Change Email</h3>
+                <form [formGroup]="form2" (ngSubmit)="onChangeEmail()">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Current email</label>
+                        <input 
+                        type="email" 
+                        formControlName="oldEmail"
+                        class="w-full border rounded-lg px-3 py-2"
+                        />
+                        <p 
+                            class="text-red-500 text-xs mt-1"
+                            *ngIf="form2.get('oldEmail')?.invalid && 
+                            form2.get('oldEmail')?.touched
+                        ">
+                        Current email is required.
+                        </p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1 mt-4">New Email</label>
+                        <input 
+                        type="email" 
+                        formControlName="newEmail"
+                        class="w-full border rounded-lg px-3 py-2"
+                        />
+                        <p 
+                            class="text-red-500 text-xs mt-1"
+                            *ngIf="form2.get('newEmail')?.invalid && 
+                            form2.get('newEmail')?.touched
+                        ">
+                        New email must be valid and at least 6 characters.
+                        </p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1 mt-4">Confirm new email</label>
+                        <input 
+                        type="email" 
+                        formControlName="confirmEmail"
+                        class="w-full border rounded-lg px-3 py-2"
+                        />
+                        <p 
+                            class="text-red-500 text-xs mt-1"
+                            *ngIf="form2.get('confirmEmail')?.invalid && 
+                            form2.get('confirmEmail')?.touched
+                        ">
+                        Emails do not match.
+                        </p>
+                    </div>
+                    <button 
+                        type="submit"
+                        class="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                        [disabled]="changingEmail() || form2.invalid"
+                    >
+                        {{ changingEmail() ? "Saving..." : "Change Email" }}
+                    </button>
+                </form>
+             </div>
+
+        </div>
+
+
+
+    </div>
+</div>

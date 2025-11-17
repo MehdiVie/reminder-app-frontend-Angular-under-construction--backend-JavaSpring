@@ -35,6 +35,9 @@ export const errorInterceptor : HttpInterceptorFn = (req,next) => {
                     break;
 
                 case 401:
+                    if (req.url.includes('/auth/login')) {
+                        return throwError(() => error);
+                    }
                     snackbar.show(apiMessage || 'Session expired. Please log in again.', 'error');
                     authService.logout();
                     setTimeout(() => router.navigate(["/login"]), 1500);

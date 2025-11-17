@@ -5,6 +5,7 @@ import { AdminDashboardComponent } from './features/admin-dashboard/admin-dashbo
 import { LoginComponent } from './features/auth/login/login';
 import { AdminGuard } from './core/guards/admin.guard';
 import { RegisterComponent } from './features/auth/register/register';
+import { ProfileComponent } from './features/profile/profile';
 
 export const routes: Routes = [
   { path: '' , redirectTo : 'events' , pathMatch : 'full'},
@@ -14,6 +15,7 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent } ,
 
   //User Pages
+  { path: 'profile', component: ProfileComponent },
   { path: 'events', component: EventListComponent },
   { path: 'events/:id', component: EventListComponent },
   

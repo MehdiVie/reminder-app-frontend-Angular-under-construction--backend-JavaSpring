@@ -55,7 +55,6 @@ export class AuthService {
         }
     }
 
-
     logout() : void {
         localStorage.removeItem(this.token_key);
         this.currentUserEmail.next(null);
