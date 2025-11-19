@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { Event } from '../models/event.model';
 import { ApiResponse } from '../models/apiResponse.model';
 import { PageResponse } from '../models/pageResponse.model';
-import { UpcomingReminder } from '../models/UpcomingReminder.model';
+import { Reminder } from '../models/reminder.model';
 import { environment } from '../../../enviroments/environment';
 
 @Injectable({
@@ -36,10 +36,6 @@ getPage(
 
   return this.http.get<ApiResponse<PageResponse<Event>>>(`${this.apiUrl}/paged`, { params });
 
-}
-
-getUpcomingRemiders(minutes : number=1) : Observable<ApiResponse<UpcomingReminder[]>> {
-  return this.http.get<ApiResponse<UpcomingReminder[]>>(`${this.apiUrl}/upcoming`, { params : { minute: minutes } });
 }
 
 getSearchedEvents(term : string) : Observable<ApiResponse<Event[]>> {

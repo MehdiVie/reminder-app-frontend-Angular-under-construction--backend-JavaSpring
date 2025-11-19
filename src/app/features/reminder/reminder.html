@@ -1,0 +1,56 @@
+<div class="p-8 bg-background min-h-screen">
+  <h2 class="text-3xl font-bold mb-6">Notifications</h2>
+
+  <div *ngIf="loading()" class="text-gray-500">Loading notifications...</div>
+
+  <div *ngIf="!loading()">
+
+    <!-- Upcoming -->
+    <h3 class="text-2xl font-semibold mt-6 mb-2">Upcoming Reminders (next 24 hours)</h3>
+
+    <div *ngIf="upcoming.length === 0" class="text-gray-500">No upcoming reminders.</div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div
+        *ngFor="let item of upcoming"
+        class="border p-4 rounded-xl shadow bg-blue-50"
+      >
+        <h4 class="text-xl font-semibold">{{ item.title }}</h4>
+        <p class="text-sm text-gray-600">Event Date: {{ item.eventDate }}</p>
+        <p class="text-sm text-gray-600">Reminder: {{ item.reminderTime | date:'short' }}</p>
+
+        <button
+          class="mt-3 bg-blue-600 text-white px-4 py-2 rounded"
+          (click)="viewEvent(item.id)"
+        >
+          View Event
+        </button>
+      </div>
+    </div>
+
+    <!-- Sent -->
+    <h3 class="text-2xl font-semibold mt-10 mb-2">Sent Reminders (last 24 hours)</h3>
+
+    <div *ngIf="sent.length === 0" class="text-gray-500">No sent reminders.</div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div
+        *ngFor="let item of sent"
+        class="border p-4 rounded-xl shadow bg-green-50"
+      >
+        <h4 class="text-xl font-semibold">{{ item.title }}</h4>
+        <p class="text-sm text-gray-600">Event Date: {{ item.eventDate }}</p>
+        <p class="text-sm text-gray-600">Sent: {{ item.reminderSentTime | date:'short' }}</p>
+
+        <button
+          class="mt-3 bg-blue-600 text-white px-4 py-2 rounded"
+          (click)="viewEvent(item.id)"
+        >
+          View Event
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+

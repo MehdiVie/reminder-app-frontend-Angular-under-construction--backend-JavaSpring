@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { EventDialog } from '../event-dialog/event-dialog';
 import { EventService } from '../../core/services/event.service';
+import { ReminderService } from '../../core/services/reminder.service';
 import { Event } from '../../core/models/event.model';
 import { ActivatedRoute } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -18,7 +19,7 @@ import { FormsModule } from '@angular/forms';
 import { debounceTime, Subject } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { UpcomingReminder } from '../../core/models/UpcomingReminder.model';
+import { Reminder } from '../../core/models/reminder.model';
 import { environment } from '../../../enviroments/environment';
 
 @Component({
@@ -43,9 +44,8 @@ export class EventListComponent implements OnInit {
   sortBy = 'id';
   direction : 'asc' | 'desc' = 'asc'
 
-  
-
   constructor(private eventService: EventService , 
+              private reminderService: ReminderService ,
               private dialog: MatDialog,
               private route : ActivatedRoute,
               private snackBar: MatSnackBar) {}
@@ -101,7 +101,8 @@ export class EventListComponent implements OnInit {
 
 
   checkUpcomingRemiders() {
-    this.eventService.getUpcomingRemiders(1).subscribe({
+    this.reminderService.getUpcomingRemiders(1).subscribe(
+      {
       next : (res) => {
         if (res.status==='success' && res.data.length > 0) {
             for(const ev of res.data) {
@@ -123,7 +124,7 @@ export class EventListComponent implements OnInit {
     })
   }
 
-  showReminderToast(event : UpcomingReminder) {
+  showReminderToast(event : Reminder) {
     this.snackBar.open(
       `Reminder "${event.title}" starts at ${new Date(event.reminderTime).toLocaleTimeString()}`,
       'View',

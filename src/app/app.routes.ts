@@ -6,6 +6,7 @@ import { LoginComponent } from './features/auth/login/login';
 import { AdminGuard } from './core/guards/admin.guard';
 import { RegisterComponent } from './features/auth/register/register';
 import { ProfileComponent } from './features/profile/profile';
+import { ReminderComponent } from './features/reminder/reminder';
 
 export const routes: Routes = [
   { path: '' , redirectTo : 'events' , pathMatch : 'full'},
@@ -17,7 +18,8 @@ export const routes: Routes = [
   //User Pages
   { path: 'profile', component: ProfileComponent },
   { path: 'events', component: EventListComponent },
-  { path: 'events/:id', component: EventListComponent },
+  { path: 'events/:id', component: EventListComponent },  
+  { path: 'reminders', component: ReminderComponent },
   
   //Admin
   {
