@@ -14,6 +14,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 })
 export class NavbarComponent  {
   
+  isMenuOpen : boolean = false;
 
   constructor(private authService: AuthService , 
               private router : Router,
@@ -33,6 +34,14 @@ export class NavbarComponent  {
         })
       }
     })
+  }
+
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  closeMenu() {
+    this.isMenuOpen = false;
   }
 
   logout() {

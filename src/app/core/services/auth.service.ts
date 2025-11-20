@@ -3,6 +3,7 @@ import { Injectable } from "@angular/core";
 import { LoginRequest, RegisterRequest , LoginResponse } from "../models/user.model";
 import { BehaviorSubject, Observable, tap } from "rxjs";
 import { environment } from '../../../enviroments/environment';
+import { ApiResponse } from "../models/apiResponse.model";
 
 @Injectable ({
     providedIn : 'root'
@@ -61,5 +62,9 @@ export class AuthService {
         localStorage.removeItem('user');
         sessionStorage.clear();
         window.location.href = '/login';
+    }
+
+    verifyToken(token : string) : Observable<ApiResponse<string>> {
+        return this.http.get<ApiResponse<string>>(`${this.apiUrl}/verify-email` , { params : { token: token } });
     }
 }

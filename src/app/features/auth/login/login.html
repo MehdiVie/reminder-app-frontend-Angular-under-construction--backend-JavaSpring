@@ -1,4 +1,7 @@
-<div class="login-wrapper">
+<div class="login-wrapper flex-col">
+    <div *ngIf="verifying()" class="text-blue-500 p-5">
+    Verifying your email...please wait...
+    </div>
     <div class="login-card">
         <h3 class="title">Sign In</h3>
         <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form">

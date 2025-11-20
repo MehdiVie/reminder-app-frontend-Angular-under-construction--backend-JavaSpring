@@ -1,10 +1,11 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, signal } from "@angular/core";
+import { Component, inject, OnInit, signal } from "@angular/core";
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { AuthService } from "../../../../app/core/services/auth.service"
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { LoginRequest } from "../../../core/models/user.model";
 import { firstValueFrom } from "rxjs";
+import { SnackbarService } from "../../../core/services/snackbar.service";
 
 @Component ({
     selector : "app-login" , 
@@ -14,11 +15,13 @@ import { firstValueFrom } from "rxjs";
     styleUrls : ["./login.css"] 
 })
 
-export class LoginComponent {
+export class LoginComponent implements OnInit {
     private authService = inject(AuthService);
+    private snackBar = inject(SnackbarService);
     private router = inject(Router);
+    private route = inject(ActivatedRoute);
     private fb = inject(FormBuilder);
-
+    verifying=signal(false);
     errorMessage = signal<string>('');
 
     form = this.fb.group({
@@ -27,6 +30,34 @@ export class LoginComponent {
     })
 
     isSubmitting = signal(false);
+    
+    ngOnInit() : void {
+        const token = this.route.snapshot.queryParamMap.get("verify");
+
+        if (token) {
+            this.verifying.set(true);
+
+            this.authService.verifyToken(token).subscribe(
+                {
+                    next : (res) => {
+                        if (res.status ==  'success') {
+                            const verifiedEmail = res.data;
+                            this.snackBar.show("Email successfully verified! Login now!", "success");
+                            this.form.get("email")?.setValue(verifiedEmail);
+                        } else {
+                            this.snackBar.show("verification failed or expired.", "error");
+                        }
+                        this.verifying.set(false);
+                    },
+                    error : () => {
+                        this.snackBar.show("verification failed or expired.", "error");
+                        this.verifying.set(false);
+                    }
+                }
+            )
+        }
+    }
+
 
     async onSubmit() {
         if (this.form.invalid) {
@@ -58,7 +89,5 @@ export class LoginComponent {
             this.isSubmitting.set(false);
         }
     }
-
-    
 
 }
