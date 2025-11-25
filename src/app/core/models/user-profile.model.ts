@@ -3,3 +3,12 @@ export interface UserProfile {
   email: string;
   roles: string[];
 }
+
+export interface ResetPasswordRequest {
+    token : string ,
+    newPassword : string
+}
+
+export interface ForgetPasswordRequest {
+    email : string 
+}

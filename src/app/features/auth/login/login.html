@@ -2,6 +2,17 @@
     <div *ngIf="verifying()" class="text-blue-500 p-5">
     Verifying your email...please wait...
     </div>
+    <div *ngIf="emailVerify" class="text-red-500  text-center">
+        Check {{emailVerify}} for verification link.
+        <br>
+        This link is valid for 30 minutes.
+    </div>
+    <div *ngIf="verifiedEmail" class="text-blue-500 text-center">
+        {{verifiedEmail}} verified successfully.
+    </div>
+    <div *ngIf="emailVerifyExpiredToken" class="text-red-500 text-center">
+        Verification link has expired. Login with your current Email :  {{emailVerifyExpiredToken}} 
+    </div>
     <div class="login-card">
         <h3 class="title">Sign In</h3>
         <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form">
@@ -56,5 +67,10 @@
             <!-- Error Message -->
             <p class="error-message" *ngIf="errorMessage()">{{ errorMessage() }}</p>
         </form>
+        <div class="text-left mt-6">
+            <a routerLink="/forget-password" class="text-blue-500">
+                Forget Password
+            </a>
+        </div>
     </div>
 </div>

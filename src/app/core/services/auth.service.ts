@@ -4,6 +4,9 @@ import { LoginRequest, RegisterRequest , LoginResponse } from "../models/user.mo
 import { BehaviorSubject, Observable, tap } from "rxjs";
 import { environment } from '../../../enviroments/environment';
 import { ApiResponse } from "../models/apiResponse.model";
+import { UserProfile } from "../models/user-profile.model";
+import { ReminderPollingService } from "./reminder-polling.service";
+import { Router } from "@angular/router";
 
 @Injectable ({
     providedIn : 'root'
@@ -16,7 +19,11 @@ export class AuthService {
 
     $currentUserEmail = this.currentUserEmail.asObservable();
 
-    constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient,
+                private polling: ReminderPollingService,
+                private router : Router) {
+                    console.log('%cAuthService CONSTRUCTOR','color: orange;');
+                }
 
     login(data : LoginRequest) : Observable<LoginResponse> {
         return this.http.post<LoginResponse>(`${this.apiUrl}/login`, data )
@@ -25,6 +32,8 @@ export class AuthService {
             console.log('[AuthService] Saving token:', res.data.token);
             localStorage.setItem(this.token_key , res.data.token);
             this.currentUserEmail.next(res.data.email);
+            console.log('%cLogin Success','color:red;');
+            
         }));
     }
 
@@ -61,10 +70,35 @@ export class AuthService {
         this.currentUserEmail.next(null);
         localStorage.removeItem('user');
         sessionStorage.clear();
-        window.location.href = '/login';
+        this.polling.stopPolling();
+        this.router.navigate(['/login']);
+    }
+
+    logoutWithoutRedirect() : void {
+        localStorage.removeItem(this.token_key);
+        this.currentUserEmail.next(null);
+        localStorage.removeItem('user');
+        sessionStorage.clear();
+        this.polling.stopPolling();
     }
 
     verifyToken(token : string) : Observable<ApiResponse<string>> {
         return this.http.get<ApiResponse<string>>(`${this.apiUrl}/verify-email` , { params : { token: token } });
     }
+
+    sendResetPasswordLink(email: string) : Observable<ApiResponse<void>> {
+        return this.http.put<ApiResponse<void>>(`${this.apiUrl}/forget-password` , { 
+            email
+        });
+    }
+
+    checkResetPasswordLinkToken(token: string) : Observable<ApiResponse<UserProfile>> {
+        return this.http.get<ApiResponse<UserProfile>>(`${this.apiUrl}/reset-password-check-token` ,  { params : { token : token } });
+    }
+
+    resetPassword(token : string , newPassword : string) : Observable<ApiResponse<void>> {
+        return this.http.put<ApiResponse<void>>(`${this.apiUrl}/reset-password` ,  { token , newPassword } );
+    }
+
+
 }

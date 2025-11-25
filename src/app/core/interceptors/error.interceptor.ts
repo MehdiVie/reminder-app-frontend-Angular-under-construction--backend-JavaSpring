@@ -30,10 +30,11 @@ export const errorInterceptor : HttpInterceptorFn = (req,next) => {
             switch(error.status) {
 
                 case 403: 
+                    //const currentUrl = router.url;
                     snackbar.show('Access denied. You are not allowed to perform this action.', 'error');
                     setTimeout(() => router.navigate(['/events']),1500);
                     break;
-
+                    
                 case 401:
                     if (req.url.includes('/auth/login')) {
                         return throwError(() => error);

@@ -2,7 +2,7 @@ import { CommonModule } from "@angular/common";
 import { Component, inject, OnInit, signal } from "@angular/core";
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { AuthService } from "../../../../app/core/services/auth.service"
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { LoginRequest } from "../../../core/models/user.model";
 import { firstValueFrom } from "rxjs";
 import { SnackbarService } from "../../../core/services/snackbar.service";
@@ -10,12 +10,17 @@ import { SnackbarService } from "../../../core/services/snackbar.service";
 @Component ({
     selector : "app-login" , 
     standalone : true ,
-    imports : [CommonModule , ReactiveFormsModule] , 
+    imports : [CommonModule , ReactiveFormsModule, RouterModule] , 
     templateUrl : "./login.html" ,
     styleUrls : ["./login.css"] 
 })
 
 export class LoginComponent implements OnInit {
+
+    constructor() {
+        console.log('%cLoginComponent CONSTRUCTOR', 'color: blue;');
+    }
+    
     private authService = inject(AuthService);
     private snackBar = inject(SnackbarService);
     private router = inject(Router);
@@ -23,6 +28,9 @@ export class LoginComponent implements OnInit {
     private fb = inject(FormBuilder);
     verifying=signal(false);
     errorMessage = signal<string>('');
+    emailVerify : string | null = null;
+    verifiedEmail : string | null = null;
+    emailVerifyExpiredToken : string | null = null;
 
     form = this.fb.group({
         email : ['', [Validators.required, Validators.email]] ,
@@ -32,6 +40,9 @@ export class LoginComponent implements OnInit {
     isSubmitting = signal(false);
     
     ngOnInit() : void {
+
+        this.emailVerify = this.route.snapshot.queryParamMap.get("emailVerify");
+
         const token = this.route.snapshot.queryParamMap.get("verify");
 
         if (token) {
@@ -44,8 +55,12 @@ export class LoginComponent implements OnInit {
                             const verifiedEmail = res.data;
                             this.snackBar.show("Email successfully verified! Login now!", "success");
                             this.form.get("email")?.setValue(verifiedEmail);
+                            this.verifiedEmail=verifiedEmail;
+                        } else if (res.status == 'error' && res.message == 'expired') {
+                            this.snackBar.show("verification expired.", "error");
+                            this.emailVerifyExpiredToken = res.data;
                         } else {
-                            this.snackBar.show("verification failed or expired.", "error");
+                            this.snackBar.show("verification failed.", "error");
                         }
                         this.verifying.set(false);
                     },
@@ -57,6 +72,8 @@ export class LoginComponent implements OnInit {
             )
         }
     }
+
+    
 
 
     async onSubmit() {

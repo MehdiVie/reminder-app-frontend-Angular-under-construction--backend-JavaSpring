@@ -10,7 +10,7 @@ type SnackType = 'success' | 'error' | 'info';
 export class SnackbarService {
     constructor(private snackbar : MatSnackBar){}
 
-    show(message : string , type : SnackType = 'info' , duration = 4000 ,
+    show(message : string , type : SnackType = 'info' , duration = 8000 ,
         vPos : MatSnackBarVerticalPosition = 'top' ,
         hPos : MatSnackBarHorizontalPosition = 'center') {
 
@@ -24,7 +24,7 @@ export class SnackbarService {
             message , 
             'Close' , 
             {
-                duration : 4000 ,
+                duration : 8000 ,
                 panelClass : [panelClass] , 
                 verticalPosition : 'top' ,
                 horizontalPosition : 'center'

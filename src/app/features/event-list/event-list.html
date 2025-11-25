@@ -91,39 +91,39 @@
 
     <!-- ID Column -->
     <ng-container matColumnDef="id">
-      <th mat-header-cell *matHeaderCellDef>ID</th>
-      <td mat-cell *matCellDef="let event">{{ event.id }}</td>
+      <th mat-header-cell *matHeaderCellDef class="col-id">ID</th>
+      <td mat-cell *matCellDef="let event" class="col-id">{{ event.id }}</td>
     </ng-container>
 
     <!-- Title Column -->
     <ng-container matColumnDef="title">
-      <th mat-header-cell *matHeaderCellDef>Title</th>
-      <td mat-cell *matCellDef="let event">{{ event.title }}</td>
+      <th mat-header-cell *matHeaderCellDef class="col-title">Title</th>
+      <td mat-cell *matCellDef="let event" class="col-title">{{ event.title }}</td>
     </ng-container>
 
     <!-- Description Column -->
     <ng-container matColumnDef="description">
-      <th mat-header-cell *matHeaderCellDef>Description</th>
-      <td mat-cell *matCellDef="let event">{{ event.description }}</td>
+      <th mat-header-cell *matHeaderCellDef class="col-description">Description</th>
+      <td mat-cell *matCellDef="let event" class="col-description">{{ event.description }}</td>
     </ng-container>
 
     <!-- EventDate Column -->
     <ng-container matColumnDef="eventDate">
-      <th mat-header-cell *matHeaderCellDef>Event-Date</th>
-      <td mat-cell *matCellDef="let event">{{ event.eventDate | date:'yyyy-MM-dd' }}</td>
+      <th mat-header-cell *matHeaderCellDef class="col-event">Event-Date</th>
+      <td mat-cell *matCellDef="let event" class="col-event">{{ event.eventDate | date:'yyyy-MM-dd' }}</td>
     </ng-container>
 
     <!-- ReminderTime Column -->
     <ng-container matColumnDef="reminderTime">
-      <th mat-header-cell *matHeaderCellDef>Reminder-Time</th>
+      <th mat-header-cell *matHeaderCellDef class="col-reminder">Reminder-Time</th>
       <!-- If backend sends ISO like "2025-10-18T17:59:02.305", date pipe formats it -->
-      <td mat-cell *matCellDef="let event">{{ event.reminderTime | date:'yyyy-MM-dd HH:mm' }}</td>
+      <td mat-cell *matCellDef="let event" class="col-reminder">{{ event.reminderTime | date:'yyyy-MM-dd HH:mm' }}</td>
     </ng-container>
 
     <!-- Actions -->
     <ng-container matColumnDef="actions" >
-      <th mat-header-cell *matHeaderCellDef>Actions</th>
-      <td mat-cell *matCellDef="let event">
+      <th mat-header-cell *matHeaderCellDef class="col-actions">Actions</th>
+      <td mat-cell *matCellDef="let event" class="col-actions">
         <button mat-icon-button color="accent" (click)="showEvent(event)">
           <mat-icon>visibility</mat-icon>
         </button>

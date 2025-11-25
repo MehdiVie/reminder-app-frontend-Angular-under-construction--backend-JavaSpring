@@ -159,10 +159,14 @@ export class ProfileComponent implements OnInit {
       {
         next : (res) => {
           if (res.status === 'success') {
-            this.snackBar.show('Email changed successfully', 'success');
+            this.snackBar.show('Email verification sent successfully', 'success');
             this.form.reset();
-            this.authService.logout();
-            //this.router.navigate(['/login']);
+            this.authService.logoutWithoutRedirect();
+            this.router.navigate(['/login'],
+              {
+                queryParams : { emailVerify : newEmail.trim() }
+              }
+            );
           }
           else {
             this.snackBar.show(res.message || 'Failed to change Email', 'error');

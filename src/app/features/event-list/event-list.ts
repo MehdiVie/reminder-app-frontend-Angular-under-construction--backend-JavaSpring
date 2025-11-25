@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -6,7 +6,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { EventDialog } from '../event-dialog/event-dialog';
 import { EventService } from '../../core/services/event.service';
-import { ReminderService } from '../../core/services/reminder.service';
 import { Event } from '../../core/models/event.model';
 import { ActivatedRoute } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -17,10 +16,10 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { debounceTime, Subject } from 'rxjs';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { Reminder } from '../../core/models/reminder.model';
 import { environment } from '../../../enviroments/environment';
+import { ReminderPollingService } from '../../core/services/reminder-polling.service';
+import { SnackbarService } from '../../core/services/snackbar.service';
 
 @Component({
   selector: 'app-event-list',
@@ -36,6 +35,7 @@ export class EventListComponent implements OnInit {
   afterDate?: string;
   searchSubject = new Subject<string>(); 
   showReminderIds = new Set<number>(); // store eventId that has Toast before
+  private polling = inject(ReminderPollingService);
 
   currentPage = 0;
   pageSize = environment.pageSize;
@@ -45,17 +45,14 @@ export class EventListComponent implements OnInit {
   direction : 'asc' | 'desc' = 'asc'
 
   constructor(private eventService: EventService , 
-              private reminderService: ReminderService ,
               private dialog: MatDialog,
               private route : ActivatedRoute,
-              private snackBar: MatSnackBar) {}
+              private snakbar : SnackbarService) {}
 
 
   ngOnInit() {
-
-    setInterval(() => {
-        this.checkUpcomingRemiders();
-    }, 30000)
+    console.log('%cEventListComponent INIT','color: purple;');
+    this.polling.startPolling();
 
     this.searchSubject.pipe(
       debounceTime(400)
@@ -86,6 +83,10 @@ export class EventListComponent implements OnInit {
             next: (res) => {
               console.log('Events received from backend:', res.data);
               const page = res.data;
+              if (page.totalPages > 0 && this.currentPage >= page.totalPages) {
+                this.currentPage = page.totalPages - 1;
+                return this.loadEvents();
+              }
               this.events = page.content;
               this.totalItems = page.totalItems;
               this.pageSize = page.size;
@@ -97,47 +98,6 @@ export class EventListComponent implements OnInit {
             },
         });
     }
-
-
-
-  checkUpcomingRemiders() {
-    this.reminderService.getUpcomingRemiders(1).subscribe(
-      {
-      next : (res) => {
-        if (res.status==='success' && res.data.length > 0) {
-            for(const ev of res.data) {
-              console.log('[Reminder] candidate event:', ev);
-              // check if eventId has toast before
-              if (this.showReminderIds.has(ev.id)) {
-                continue;
-              }
-
-              console.log('[Reminder] showing toast for id', ev.id);
-              this.showReminderIds.add(ev.id); 
-              this.showReminderToast(ev);
-            }
-        }
-      },
-      error: (err) => {
-        console.error('Error showing reminder-toast:', err);
-      },
-    })
-  }
-
-  showReminderToast(event : Reminder) {
-    this.snackBar.open(
-      `Reminder "${event.title}" starts at ${new Date(event.reminderTime).toLocaleTimeString()}`,
-      'View',
-      {
-        duration : 8000,
-        horizontalPosition : 'center',
-        verticalPosition : 'top'
-      }
-    ).onAction().subscribe(() => {
-      this.showEvent(event);
-    });
-
-  }
 
   nextPage() {
     if (this.currentPage + 1 < this.totalPages) {
@@ -183,7 +143,10 @@ export class EventListComponent implements OnInit {
   deleteEvent(id: number) {
     if (confirm('Are you sure you want to delete this event?')) {
       this.eventService.delete(id).subscribe({
-        next: () => this.loadEvents(),
+        next: () => {
+          this.snakbar.show("Event deleted successfully.","info");
+          this.loadEvents();
+        },
         error: (err) => console.error('Delete failed:', err)
       });
     }

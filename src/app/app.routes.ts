@@ -7,6 +7,8 @@ import { AdminGuard } from './core/guards/admin.guard';
 import { RegisterComponent } from './features/auth/register/register';
 import { ProfileComponent } from './features/profile/profile';
 import { ReminderComponent } from './features/reminder/reminder';
+import { ForgetPasswordComponent } from './features/forget-password/forget-password';
+import { ResetPasswordComponent } from './features/reset-password/reset-password';
 
 export const routes: Routes = [
   { path: '' , redirectTo : 'events' , pathMatch : 'full'},
@@ -14,6 +16,8 @@ export const routes: Routes = [
   //Auth
   { path: 'login', component: LoginComponent } ,
   { path: 'register', component: RegisterComponent } ,
+  { path: 'forget-password', component: ForgetPasswordComponent } ,
+  { path: 'reset-password', component: ResetPasswordComponent } ,
 
   //User Pages
   { path: 'profile', component: ProfileComponent },

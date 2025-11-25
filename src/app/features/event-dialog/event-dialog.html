@@ -17,7 +17,7 @@
       <p class="text-gray-800 text-base whitespace-pre-line">{{ data.description || '—' }}</p>
     </div>
 
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid md:grid-cols-2 gap-4">
       <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
         <h3 class="text-sm font-semibold text-gray-500 uppercase mb-1">Event Date</h3>
         <p class="text-gray-900 text-base">{{ data.eventDate | date: 'yyyy-MM-dd' }}</p>
