@@ -65,7 +65,6 @@ update(id : number , event : Event): Observable<ApiResponse<Event>> {
 }
 
 
-
 delete(id: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
   }

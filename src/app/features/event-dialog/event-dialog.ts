@@ -8,7 +8,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { ChangeDetectorRef } from '@angular/core';
 import { EventService } from '../../core/services/event.service';
 import { MatIconModule } from '@angular/material/icon';
-
+import { MatSelectModule } from '@angular/material/select';
+import { MatOptionModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-event-dialog',
@@ -19,7 +20,9 @@ import { MatIconModule } from '@angular/material/icon';
     MatInputModule,
     MatButtonModule,
     MatDialogModule,
-    MatIconModule
+    MatIconModule,
+    MatSelectModule,
+    MatOptionModule
 ],
   templateUrl: './event-dialog.html',
   styleUrls: ['./event-dialog.css']
@@ -40,7 +43,12 @@ export class EventDialog {
         title : [data.title , Validators.required] ,
         description : [data.description] , 
         eventDate : [this.normalizeDate(data.eventDate) , Validators.required] ,
-        reminderTime : [this.normalizeDateTimeLocal(data.reminderTime)] 
+        reminderTime : [this.normalizeDateTimeLocal(data.reminderTime)] ,
+
+        recurrenceType : [data.recurrenceType ?? 'NONE'] , 
+        recurrenceInterval : [data.recurrenceInterval ?? 1] , 
+        recurrenceEndDate : [data.recurrenceEndDate ?? null]
+
      })
      if (data.readonly) {
      this.form.disable(); 

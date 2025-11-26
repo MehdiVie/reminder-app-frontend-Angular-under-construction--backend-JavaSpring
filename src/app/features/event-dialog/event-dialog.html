@@ -80,6 +80,36 @@
           {{ backendErrors?.reminderTime }}
         </mat-error>
       </mat-form-field>
+
+      <!-- Recurrence-Type-->
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Recurrence Type</mat-label>
+        <mat-select formControlName="recurrenceType">
+          <mat-option value="NONE">Do not repeat</mat-option>
+          <mat-option value="DAILY">Every day</mat-option>
+          <mat-option value="WEEKLY">Every week</mat-option>
+          <mat-option value="MONTHLY">Every month</mat-option>
+          <mat-option value="QUARTERLY">Every quarter</mat-option>
+          <mat-option value="YEARLY">Every year</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Recurrence-Interval (optional)-->
+      <mat-form-field *ngIf="form.get('recurrenceType')?.value !== 'NONE'" appearance="fill" class="w-full">
+        <mat-label>Every</mat-label>
+        <input matInput type="number" formControlName="recurrenceInterval" min="1">
+        <p class="text-xs text-gray-500 ">
+          Example : 2 = for 2 Days/Weeks/Months/Quarters/Years
+        </p>
+      </mat-form-field>
+
+      <!-- Recurrence-EndDate -->
+      <mat-form-field *ngIf="form.get('recurrenceType')?.value !== 'NONE'" appearance="fill" class="w-full">
+        <mat-label>Recurrence EndDate</mat-label>
+        <input matInput type="date" formControlName="recurrenceEndDate" />
+      </mat-form-field>
+
+
     </form>
   </ng-template>
 </mat-dialog-content>
