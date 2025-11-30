@@ -4,11 +4,12 @@ import { Router, RouterModule  } from '@angular/router';
 import { CommonModule } from '@angular/common';  
 import { EventDialog } from '../../features/event-dialog/event-dialog';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatIcon } from "@angular/material/icon";
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, MatIcon],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })

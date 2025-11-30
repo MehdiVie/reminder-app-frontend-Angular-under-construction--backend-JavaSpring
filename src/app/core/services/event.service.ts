@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Event } from '../models/event.model';
+import { Event, MoveOccurrenceRequest } from '../models/event.model';
 import { ApiResponse } from '../models/apiResponse.model';
 import { PageResponse } from '../models/pageResponse.model';
 import { Reminder } from '../models/reminder.model';
@@ -44,6 +44,25 @@ getSearchedEvents(term : string) : Observable<ApiResponse<Event[]>> {
     params = params.set('search',term);
   }
   return this.http.get<ApiResponse<Event[]>>(`${this.apiUrl}`, { params });
+}
+
+getCalendarEvents(start : string , end : string) {
+  return this.http.get<ApiResponse<Event[]>>(`${this.apiUrl}/calendar` , 
+    { params : { start : start , end : end } })
+}
+
+moveOccurrence(eventId: number, body: MoveOccurrenceRequest) {
+  return this.http.put<ApiResponse<void>>(
+    `${this.apiUrl}/${eventId}/move-occurrence`,
+    body
+  );
+}
+
+moveEventDate(eventId: number, newDate: string) {
+  return this.http.put<ApiResponse<void>>(
+    `${this.apiUrl}/${eventId}/move-date`,
+    { eventDate: newDate }
+  );
 }
 
 getAll(): Observable<ApiResponse<Event[]>> {

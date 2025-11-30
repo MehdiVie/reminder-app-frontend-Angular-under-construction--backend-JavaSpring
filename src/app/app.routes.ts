@@ -9,6 +9,7 @@ import { ProfileComponent } from './features/profile/profile';
 import { ReminderComponent } from './features/reminder/reminder';
 import { ForgetPasswordComponent } from './features/forget-password/forget-password';
 import { ResetPasswordComponent } from './features/reset-password/reset-password';
+import { CalendarComponent } from './features/calendar/calendar';
 
 export const routes: Routes = [
   { path: '' , redirectTo : 'events' , pathMatch : 'full'},
@@ -24,6 +25,7 @@ export const routes: Routes = [
   { path: 'events', component: EventListComponent },
   { path: 'events/:id', component: EventListComponent },  
   { path: 'reminders', component: ReminderComponent },
+  { path: 'calendar', component: CalendarComponent },
   
   //Admin
   {

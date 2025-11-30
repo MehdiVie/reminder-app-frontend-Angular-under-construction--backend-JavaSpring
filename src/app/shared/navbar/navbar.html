@@ -33,6 +33,14 @@
       <li><a routerLink="/events" class="hover:text-blue-500">My Events</a></li>
       <li>
         <button 
+            routerLink="/calendar"
+            class="text-blue-600 hover:text-blue-800 text-xl mt-2"
+        >
+            <mat-icon>calendar_month</mat-icon>
+        </button>
+      </li>
+      <li>
+        <button 
         class="hover:text-blue-500"
         (click)="openAddEventDialog()">
         Add Event

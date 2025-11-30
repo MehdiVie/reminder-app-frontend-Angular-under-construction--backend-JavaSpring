@@ -1,6 +1,6 @@
 
 
-export type RecurrenceType = 'NONE' | 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'QUARTERLY' |'YEARLY';
+export type RecurrenceType = 'NONE' | 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY';
 
 // shared Event model - used across services and components
 export interface Event {
@@ -13,4 +13,14 @@ export interface Event {
     recurrenceType : RecurrenceType;
     recurrenceInterval?: number;
     recurrenceEndDate : string | null;
+
+    parentEventId?: number | null;
+    exception?: boolean;
+    originalDate?: string | null;
+}
+
+export interface MoveOccurrenceRequest {
+  originalDate: string;   // ISO date (yyyy-MM-dd)
+  newDate: string;        // ISO date (yyyy-MM-dd)
+  mode: 'SINGLE' | 'FUTURE';  
 }
