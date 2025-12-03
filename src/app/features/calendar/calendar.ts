@@ -1,128 +1,152 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { FullCalendarModule } from '@fullcalendar/angular';
+import { Component, ViewChild } from '@angular/core';
+import {
+  FullCalendarModule,
+  FullCalendarComponent
+} from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { EventService } from '../../core/services/event.service';
 import { MatDialog } from '@angular/material/dialog';
-import { EventDialog } from '../event-dialog/event-dialog';
+
+import { EventService } from '../../core/services/event.service';
 import { Event, MoveOccurrenceRequest } from '../../core/models/event.model';
+import { RecurringMoveDialogComponent } from './recurring-move-dialog/recurring-move-dialog';
 
 @Component({
   selector: 'app-calendar',
-  standalone : true ,
-  imports: [CommonModule , FullCalendarModule],
+  standalone: true,
+  imports: [CommonModule, FullCalendarModule],
   templateUrl: './calendar.html',
-  styleUrl: './calendar.css',
+  styleUrls: ['./calendar.css'],
 })
 export class CalendarComponent {
 
-  calendarOptions : any = {
-    initialView : 'dayGridMonth',
-    plugins : [dayGridPlugin, interactionPlugin],
+  @ViewChild(FullCalendarComponent)
+  calendarComponent!: FullCalendarComponent;
+
+  calendarOptions: any = {
+    initialView: 'dayGridMonth',
+    plugins: [dayGridPlugin, interactionPlugin],
     headerToolbar: {
-      left:'today prev,next',
+      left: 'today prev,next',
       center: 'title',
       right: ''
     },
-    events : [],
-    editable : true ,
+    editable: true,
     eventDurationEditable: false,
+    eventSources: [],
     datesSet: (arg: any) => this.onDatesSet(arg),
-    eventDrop : (arg : any) => this.onEventDrop(arg),
-  }
+    eventDrop: (arg: any) => this.onEventDrop(arg),
+  };
+
 
   constructor(
-    private eventService: EventService ,
-    private dialog : MatDialog
+    private eventService: EventService,
+    private dialog: MatDialog
   ) {}
 
+private loadRange(start: string, end: string) {
+  const api = this.calendarComponent.getApi();
 
-  onDatesSet(arg : any) {
+  api.removeAllEventSources();
+
+  api.addEventSource({
+    events: (info, successCallback, failureCallback) => {
+      this.eventService.getCalendarEvents(start, end).subscribe({
+        next: (res) => {
+          if (res.status !== 'success') return successCallback([]);
+
+          const fcEvents = res.data.map(ev => ({
+            id: ev.id.toString(),
+            title: ev.title,
+            start: ev.eventDate,
+            color: this.getColorForRecurrence(ev.recurrenceType),
+            extendedProps: {
+              recurrenceType: ev.recurrenceType,
+              recurrenceInterval: ev.recurrenceInterval,
+              recurrenceEndDate: ev.recurrenceEndDate,
+              isException: ev.exception,
+              parentEventId: ev.parentEventId,
+              originalDate: ev.originalDate ?? null
+            }
+          }));
+
+          successCallback(fcEvents);
+        },
+        error: failureCallback
+      });
+    }
+  });
+}
+
+  onDatesSet(arg: any) {
     const start = arg.start.toISOString().substring(0, 10);
     const end   = arg.end.toISOString().substring(0, 10);
-
-    
-    this.eventService.getCalendarEvents(start,end).subscribe(
-      {
-        next : (res) => {
-          if(res.status == 'success') {
-            const events = res.data;
-            
-            this.calendarOptions.events = events.map(ev=>({
-              id : ev.id , 
-              title : ev.title , 
-              start : ev.eventDate , 
-              color : this.getColorForRecurrence(ev.recurrenceType),
-              extendedProps : {
-                recurrenceType : ev.recurrenceType,
-                isException : ev.exception,
-                parentEventId : ev.parentEventId,
-                originalDate : ev.originalDate || ev.eventDate
-              }
-            }))
-          }
-        },
-        error : (err) => console.error("Calendar load error",err),
-      }
-    )
+    this.loadRange(start, end);
   }
 
-  onEventDrop(arg : any) {
-    const ev = arg.event;
-    const props = ev.extendedProps;
-
-    const newDateIso = arg.event.startStr.substring(0, 10);
-
-    const recurrenceType = props.recurrenceType as string | null | undefined;
-    const isException = !!props.isException;
-    const hasParent = !!props.parentEventId;
-
-    const isRecurring = recurrenceType && recurrenceType !== 'NONE';
-
-    if (!isRecurring && !isException && !hasParent) {
-      this.eventService.moveEventDate(ev.id,newDateIso).subscribe(
-      {
-          next : (res) => {
-            if (res.status != 'success') {
-              arg.revert();
-            } 
-          },
-          error : (err) => {
-            arg.revert();
-          }
-      })
-      return;
-    }
-
-    const payload: MoveOccurrenceRequest = {
-      originalDate: props.originalDate,   // occurrence actual date before move
-      newDate: newDateIso,                // new date selected by user
-      mode: 'SINGLE'
-    };
-
-    const effectiveEventId  = isException 
-      ? ev.id : (props.parentEventId || ev.id);
-
-    this.eventService.moveOccurrence(effectiveEventId , payload).subscribe(
-      {
-        next : (res) => {
-          if(res.status !== 'success') arg.revert();
-        } ,
-        error : (err) => {
-          arg.revert();
-        }
-      })
+  async onEventDrop(arg: any) {
     
+  const ev = arg.event;
+  const props = ev.extendedProps;
+
+  const newDateIso = ev.startStr.substring(0, 10);
+  const oldDateIso = arg.oldEvent.startStr.substring(0, 10);
+
+  const isRecurring = props.recurrenceType && props.recurrenceType !== 'NONE';
+  const isException = !!props.isException;
+  const parentEventId = props.parentEventId ?? null;
+
+  if (!isRecurring && !isException && !parentEventId) {
+    this.eventService.moveEventDate(ev.id, newDateIso).subscribe({
+      next: (res) => {
+        if (res.status !== 'success') return arg.revert();
+        this.calendarComponent.getApi().refetchEvents();
+      },
+      error: () => arg.revert()
+    });
+    return;
   }
 
-  getColorForRecurrence(type: string|null|undefined): string {
-      switch (type) {
-        case 'DAILY': return '#2563eb';    
-        case 'WEEKLY': return '#16a34a';   
-        case 'MONTHLY': return '#eab308';  
-        case 'YEARLY': return '#f97316';   
-        default: return '#6b7280';         
+  const masterId: number = parentEventId ?? Number(ev.id);
+  const originalDate = oldDateIso;
+
+  const mode = await this.openRecurringDialog();
+  if (!mode) return arg.revert();
+
+  const payload: MoveOccurrenceRequest = {
+    originalDate,
+    newDate: newDateIso,
+    mode
+  };
+
+  this.eventService.moveOccurrence(masterId, payload).subscribe({
+    next: (res) => {
+      if (res.status !== 'success') return arg.revert();
+      this.calendarComponent.getApi().refetchEvents();
+    },
+    error: () => arg.revert()
+  });
+}
+
+
+ 
+  private openRecurringDialog():
+    Promise<'SINGLE' | 'THIS_AND_FUTURE' | 'ALL' | null> {
+    const dialogRef = this.dialog.open(RecurringMoveDialogComponent, {
+      width: '360px',
+    });
+    return dialogRef.afterClosed().toPromise();
+  }
+
+  
+  getColorForRecurrence(type: string | null | undefined): string {
+    switch (type) {
+      case 'DAILY': return '#2563eb';
+      case 'WEEKLY': return '#16a34a';
+      case 'MONTHLY': return '#eab308';
+      case 'YEARLY': return '#f97316';
+      default: return '#6b7280'; // NONE یا null
     }
   }
 

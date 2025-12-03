@@ -22,5 +22,5 @@ export interface Event {
 export interface MoveOccurrenceRequest {
   originalDate: string;   // ISO date (yyyy-MM-dd)
   newDate: string;        // ISO date (yyyy-MM-dd)
-  mode: 'SINGLE' | 'FUTURE';  
+  mode: 'SINGLE' | 'THIS_AND_FUTURE' | 'ALL';
 }

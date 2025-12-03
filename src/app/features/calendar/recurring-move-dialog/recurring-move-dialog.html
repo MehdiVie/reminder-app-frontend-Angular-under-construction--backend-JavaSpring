@@ -1,0 +1,31 @@
+<h2 mat-dialog-title>Move Recurring Event</h2>
+
+<div mat-dialog-content class="space-y-2">
+  <p>How would you like to move this recurring event?</p>
+  <ul class="list-disc pl-5 text-sm text-gray-600">
+    <li><b>Only this event</b>: An exception will be created.</li>
+    <li><b>This and future events</b>: The recurrence pattern will change starting from this date.</li>
+    <li><b>All events</b>: The entire series will be moved from start to finish.</li>
+  </ul>
+</div>
+
+<div mat-dialog-actions class="flex flex-col gap-2 mt-4">
+  <button mat-stroked-button color="primary"
+          (click)="choose('SINGLE')">
+    Only this event
+  </button>
+
+  <button mat-stroked-button color="accent"
+          (click)="choose('THIS_AND_FUTURE')">
+    This and future events
+  </button>
+
+  <button mat-stroked-button color="warn"
+          (click)="choose('ALL')">
+    All events
+  </button>
+
+  <button mat-button (click)="cancel()">
+    Cancel
+  </button>
+</div>
