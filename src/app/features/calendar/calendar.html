@@ -1,3 +1,16 @@
+<div class="flex items-center justify-between mx-10 my-10">
+    <h2 class="text-xl font-semibold text-gray-800"> 
+        Calendar
+    </h2>
+    <button
+        mat-flat-button
+        color="primary"
+        class="rounded-xl px-4 py-2 !text-white shadow-sm hover:shadow-md transition"
+        (click)="openAddDialog()"
+    >
+        Add Event
+    </button>
+</div>
 <div class="calendar-container p-4 bg-white rounded-x1 shadow-md">
     <full-calendar [options]="calendarOptions"></full-calendar>
 </div>

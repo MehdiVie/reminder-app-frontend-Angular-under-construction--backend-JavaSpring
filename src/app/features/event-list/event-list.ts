@@ -127,8 +127,6 @@ export class EventListComponent implements OnInit {
     this.searchSubject.next(term);
   }
 
-
-
   getEvent(id : number) {
     this.eventService.getById(id).subscribe({
       next: (res) => {

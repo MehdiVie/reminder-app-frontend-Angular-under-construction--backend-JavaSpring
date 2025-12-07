@@ -1,18 +1,20 @@
-import { Component, Inject } from '@angular/core';
+import { Component, inject, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { ChangeDetectorRef } from '@angular/core';
-import { EventService } from '../../core/services/event.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
+import { EventService } from '../../core/services/event.service';
+import { SnackbarService } from '../../core/services/snackbar.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-event-dialog',
+  standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -23,64 +25,63 @@ import { MatOptionModule } from '@angular/material/core';
     MatIconModule,
     MatSelectModule,
     MatOptionModule
-],
+  ],
   templateUrl: './event-dialog.html',
   styleUrls: ['./event-dialog.css']
 })
 export class EventDialog {
-  form : FormGroup;
-  backendErrors : any = {};
+  form: FormGroup;
+  backendErrors: any = {};
   isSaving = false;
+  eventService = inject(EventService);
+  snakbar = inject(SnackbarService);
 
-  constructor (
-    private fb : FormBuilder ,
-    private dialogRef: MatDialogRef<EventDialog> ,
-    private eventService : EventService ,
-    private cdr : ChangeDetectorRef ,
-    @Inject(MAT_DIALOG_DATA) public data: any
+  constructor(
+    private fb: FormBuilder,
+    private dialogRef: MatDialogRef<EventDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private router : Router
   ) {
-     this.form = this.fb.group ({
-        title : [data.title , Validators.required] ,
-        description : [data.description] , 
-        eventDate : [this.normalizeDate(data.eventDate) , Validators.required] ,
-        reminderTime : [this.normalizeDateTimeLocal(data.reminderTime)] ,
+    this.form = this.fb.group({
+      id : [data.id],
+      title: [data.title, Validators.required],
+      description: [data.description],
+      eventDate: [this.normalizeDate(data.eventDate), Validators.required],
+      reminderTime: [this.normalizeDateTimeLocal(data.reminderTime)],
 
-        recurrenceType : [data.recurrenceType ?? 'NONE'] , 
-        recurrenceInterval : [data.recurrenceInterval ?? 1] , 
-        recurrenceEndDate : [data.recurrenceEndDate ?? null]
+      recurrenceType: [data.recurrenceType ?? 'NONE'],
+      recurrenceInterval: [data.recurrenceInterval ?? 1],
+      recurrenceEndDate: [data.recurrenceEndDate ?? null]
+    });
 
-     })
-     if (data.readonly) {
-     this.form.disable(); 
+    if (data.readonly) {
+      this.form.disable();
     }
   }
 
-  // yyy-mm-dd
+  // yyyy-MM-dd
   private normalizeDate(val: string | null): string {
     if (!val) return '';
     return val.substring(0, 10);
   }
 
-  // yyyy-mm-ddTHH:mm
-  private normalizeDateTimeLocal(val: string | null) : string {
-    if (!val) return '';
-
+  // yyyy-MM-ddTHH:mm
+  private normalizeDateTimeLocal(val: string | null): string {
+    if (!val) return "";
     const cleaned = val
-    .replace(/\.\d+.*$/, '')   
-    .replace(/:\d{2}$/, '');  
-
+      .replace(/\.\d+.*$/, '')
+      .replace(/:\d{2}$/, '');
     return cleaned.substring(0, 16);
   }
 
-  // minEventDate & minReminderTime
-  get minEventDate() : string {
+  get minEventDate(): string {
     const d = new Date();
     d.setDate(d.getDate() + 1);
-    return d.toISOString().split('T')[0];
+    return d.toISOString().split("T")[0];
   }
 
-  get minReminderTime() : string {
-    return new Date().toISOString().substring(0,16); // yyyy-mm-ddTHH:mm (without second)
+  get minReminderTime(): string {
+    return new Date().toISOString().substring(0, 16);
   }
 
   save() {
@@ -89,97 +90,95 @@ export class EventDialog {
       return;
     }
 
-    this.isSaving = true;
     this.backendErrors = {};
+    this.isSaving = true;
 
-    // make data for backend
     const payload = { ...this.form.value };
 
-    // Normalize formats
+    // Normalize eventDate
     if (payload.eventDate) {
       payload.eventDate = payload.eventDate.substring(0, 10);
+
       if (payload.eventDate < this.minEventDate) {
-        const temp = this.form.get("eventDate");
-
-        if (temp) {
-          temp.setErrors({ backend : true });
-          temp.markAsTouched();
+        const ctrl = this.form.get("eventDate");
+        if (ctrl) {
+          ctrl.setErrors({ backend: true });
+          ctrl.markAsTouched();
         }
-
-        this.backendErrors.eventDate = `Event date must be at least 
-        ${this.minEventDate}.`;
+        this.backendErrors.eventDate = `Event date must be at least ${this.minEventDate}.`;
         this.isSaving = false;
-        this.cdr.detectChanges();
         return;
       }
     }
 
+    // Normalize reminderTime
     if (payload.reminderTime) {
-      if (!payload.reminderTime.includes('T')) {
-        payload.reminderTime = payload.reminderTime.replace(' ', 'T');
+      if (!payload.reminderTime.includes("T")) {
+        payload.reminderTime = payload.reminderTime.replace(" ", "T");
       }
       if (payload.reminderTime.length === 16) {
-        payload.reminderTime += ':00';
+        payload.reminderTime += ":00";
       }
     }
 
-    // Validation: reminder before event
+    // Reminder before eventDate
     if (payload.reminderTime && payload.eventDate) {
       const eventDate = new Date(payload.eventDate);
       const reminder = new Date(payload.reminderTime);
       if (reminder >= eventDate) {
-        const temp = this.form.get("reminderTime");
-
-        if (temp) {
-          temp.setErrors({ backend : true });
-          temp.markAsTouched();
+        const ctrl = this.form.get("reminderTime");
+        if (ctrl) {
+          ctrl.setErrors({ backend: true });
+          ctrl.markAsTouched();
         }
-
-        this.backendErrors.reminderTime = 'Reminder must be before the event date.';
+        this.backendErrors.reminderTime = "Reminder must be before the event date.";
         this.isSaving = false;
-        this.cdr.detectChanges();
         return;
       }
     }
 
-      const $request = this.data.id ? 
-                       this.eventService.update(this.data.id,payload) :
-                       this.eventService.create(payload);
+    if (!this.data.id) {
 
-      $request.subscribe({
-        next: () => {
-          this.isSaving=false;
-          this.dialogRef.close(true); // success, close dialog! and tell it to list
-        },
-        error : (err) => {
-          this.isSaving=false;
-          // show errors from backend-validation in from
-          if (err?.error?.data) {
-            //console.log('Backend validation errors:', err.error.data);
-            this.backendErrors = err.error.data;
-            Object.keys(this.backendErrors).forEach((key) => {
-              const pureKey = key.includes('.') 
-                              ? key.split('.').pop()! 
-                              : key;
-              const control = this.form.get(pureKey);
-              if (control) {
-                control.setErrors({ backend: true });
-                control.markAsTouched();
-              }
-            });
-          } else {
-          this.backendErrors._global = err?.error?.message || 'Save failed.';
+      this.eventService.create(payload).subscribe({
+        next : (res) => {
+          if (res.status == 'success') {
+            this.snakbar.show('Event created successfully.','success');
+            this.isSaving=false;
+            this.dialogRef.close('created');
           }
-          
-          this.cdr.detectChanges();
+          else {
+            this.isSaving = false;
+            this.snakbar.show("Create failed!", "error");
+          }
+        } ,
+        error: (err) => {
+          this.isSaving = false;
+          console.error(err);
+          this.snakbar.show("Create failed!", "error");
         }
-
       });
 
+      return;
+    }
+
     
+    this.isSaving = false;
+    this.dialogRef.close(payload);
   }
 
   cancel() {
     this.dialogRef.close();
   }
+  deleteEvent(id: number) {
+    if (confirm('Are you sure you want to delete this event?')) {
+      this.eventService.delete(id).subscribe({
+        next: () => {
+          this.snakbar.show("Event deleted successfully.","info");
+          this.dialogRef.close('deleted');
+        },
+        error: (err) => console.error('Delete failed:', err)
+      });
+    }
+  }
+  
 }

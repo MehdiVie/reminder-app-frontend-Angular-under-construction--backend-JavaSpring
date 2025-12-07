@@ -96,7 +96,7 @@ export class LoginComponent implements OnInit {
             if (roles.includes("ADMIN")) {
                 this.router.navigate(['/admin/events']);
             } else {
-                this.router.navigate(['/events']);
+                this.router.navigate(['/calendar']);
             }
      
         } catch(err) {
